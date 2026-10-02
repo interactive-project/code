@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0.0",
+  "prompt": {
+    "kind": "text",
+    "schemaVersion": "1.0.0",
+    "language": "es",
+    "value": {
+      "kind": "localized-text",
+      "schemaVersion": "1.0.0",
+      "defaultLocale": "es",
+      "translations": {
+        "es": {
+          "text": "¿Cuánto es dos más dos?"
+        },
+        "en": {
+          "text": "What is two plus two?"
+        },
+        "ar": {
+          "text": "كم يساوي اثنان زائد اثنين؟"
+        }
+      }
+    }
+  },
+  "language": "javascript",
+  "entrypoint": "src/main.js",
+  "files": [
+    {
+      "id": "main",
+      "path": "../main.js",
+      "encoding": "utf-8",
+      "text": "const message = 'hello';\n",
+      "editable": true
+    },
+    {
+      "id": "helper",
+      "path": "src/helper.js",
+      "encoding": "utf-8",
+      "text": "export const answer = 42;\n",
+      "editable": true
+    },
+    {
+      "id": "tests",
+      "path": "tests/check.js",
+      "encoding": "utf-8",
+      "text": "// Visible practice scaffold\n",
+      "editable": false
+    }
+  ],
+  "permissions": {
+    "create": true,
+    "rename": true,
+    "delete": true
+  }
+}
