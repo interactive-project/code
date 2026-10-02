@@ -17,6 +17,7 @@ export function createEvaluationClient({remote,getCurrent,cryptoProvider,validat
  function sanitize(s,input){const r=copyEvaluation(input),categories=['completed','assertion-failed','compile-error','runtime-error','infrastructure-error','pending'];
   if(!r||Object.keys(r).sort().join(',')!=='category,fileDigest,result,submissionId'||r.submissionId!==s.submissionId||r.fileDigest!==s.fileDigest||!categories.includes(r.category))throw new CodeError('evaluation.response');
   let valid;try{valid=validateResult(r.result,{activityId:s.request.activityId,sessionId:s.request.sessionId,attemptId:s.request.attemptId});}catch{}
+  if(valid&&typeof valid.then==='function'){Promise.resolve(valid).catch(()=>{});throw new CodeError('evaluation.response');}
   if(valid?.valid!==true||r.result.revision!==s.request.revision)throw new CodeError('evaluation.response');
   if(r.category==='pending'){if(r.result.status!=='pending')throw new CodeError('evaluation.response');return pendingReport(s);}
   if(r.category==='infrastructure-error'){if(r.result.status!=='failed')throw new CodeError('evaluation.response');return failureReport(s);}
