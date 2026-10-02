@@ -15,7 +15,8 @@
     "fixtures",
     "README.md",
     "execution",
-    "providers"
+    "providers",
+    "evaluation"
   ],
   "exports": {
     ".": {
@@ -44,10 +45,20 @@
       "import": "./providers/docker/index.js",
       "default": "./providers/docker/index.js"
     },
-    "./schemas/run-request.v1.schema.json": "./schemas/run-request.v1.schema.json"
+    "./schemas/run-request.v1.schema.json": "./schemas/run-request.v1.schema.json",
+    "./evaluation": {
+      "types": "./evaluation/index.d.ts",
+      "import": "./evaluation/index.js",
+      "default": "./evaluation/index.js"
+    },
+    "./evaluation/trusted": {
+      "types": "./evaluation/trusted.d.ts",
+      "import": "./evaluation/trusted.js",
+      "default": "./evaluation/trusted.js"
+    }
   },
   "scripts": {
-    "test": "node scripts/check-conformance.mjs && node scripts/check-editor.mjs && node scripts/check-execution.mjs",
+    "test": "node scripts/check-conformance.mjs && node scripts/check-editor.mjs && node scripts/check-execution.mjs && node scripts/check-evaluation.mjs",
     "test:docker": "node scripts/check-docker.mjs"
   },
   "peerDependencies": {
