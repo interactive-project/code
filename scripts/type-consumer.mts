@@ -9,3 +9,7 @@ import {createExecutionCoordinator,type RunRequest} from '../execution/index.js'
 import {createDockerProvider} from '../providers/docker/index.js';
 declare const request:RunRequest;
 const coordinator=createExecutionCoordinator({getCurrent:()=>request});coordinator.run(request);coordinator.dispose();void createDockerProvider;
+
+import {createSubmission,createEvaluationClient} from '@interactive-project/code/evaluation';
+import {createTrustedEvaluator} from '@interactive-project/code/evaluation/trusted';
+void createSubmission;void createEvaluationClient;void createTrustedEvaluator;
