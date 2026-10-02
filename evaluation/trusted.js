@@ -16,10 +16,10 @@ export function createTrustedEvaluator({tests,visibility='private',runCase,crypt
    if(signal?.aborted)return failureReport(s,'cancelled');
    if(outcome.status==='pending')return pendingReport(s);
    if(outcome.status==='infrastructure-error')return failureReport(s);
-   if(outcome.status==='compile-error'||outcome.status==='runtime-error'){category=outcome.status;return copyEvaluation({submissionId:s.submissionId,fileDigest:s.fileDigest,category,result:{...resultBase(s),status:'completed',score:0,scale:'normalized'},...(visibility==='public'?{cases:[...cases,{id:test.id,status:category,credit:0}]}:{})});}
+   if(outcome.status==='compile-error'||outcome.status==='runtime-error'){category=outcome.status;return copyEvaluation({submissionId:s.submissionId,fileDigest:s.fileDigest,category,result:{...resultBase(s),status:'completed',score:{value:0,scale:'normalized'}},...(visibility==='public'?{cases:[...cases,{id:test.id,status:category,credit:0}]}:{})});}
    const passed=outcome.stdout===test.expected,credit=passed?1:0;cases.push({id:test.id,status:passed?'passed':'assertion-failed',credit});numerator+=test.weight*credit;total+=test.weight;if(!passed)category='assertion-failed';
   }
-  return copyEvaluation({submissionId:s.submissionId,fileDigest:s.fileDigest,category,result:{...resultBase(s),status:'completed',score:numerator/total,scale:'normalized'},...(visibility==='public'?{cases}:{})});
+  return copyEvaluation({submissionId:s.submissionId,fileDigest:s.fileDigest,category,result:{...resultBase(s),status:'completed',score:{value:numerator/total,scale:'normalized'}},...(visibility==='public'?{cases}:{})});
  }
  return Object.freeze({evaluate});
 }

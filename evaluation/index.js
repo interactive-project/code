@@ -20,8 +20,8 @@ export function createEvaluationClient({remote,getCurrent,cryptoProvider,validat
   if(valid?.valid!==true||r.result.revision!==s.request.revision)throw new CodeError('evaluation.response');
   if(r.category==='pending'){if(r.result.status!=='pending')throw new CodeError('evaluation.response');return pendingReport(s);}
   if(r.category==='infrastructure-error'){if(r.result.status!=='failed')throw new CodeError('evaluation.response');return failureReport(s);}
-  if(r.result.status!=='completed'||!Number.isFinite(r.result.score)||r.result.score<0||r.result.score>1||r.result.scale!=='normalized'||(['compile-error','runtime-error'].includes(r.category)&&r.result.score!==0))throw new CodeError('evaluation.response');
-  return copyEvaluation({submissionId:s.submissionId,fileDigest:s.fileDigest,category:r.category,result:{...resultBase(s),status:'completed',score:r.result.score,scale:'normalized'}});
+  if(r.result.status!=='completed'||!Number.isFinite(r.result.score.value)||r.result.score.value<0||r.result.score.value>1||r.result.score.scale!=='normalized'||(['compile-error','runtime-error'].includes(r.category)&&r.result.score.value!==0))throw new CodeError('evaluation.response');
+  return copyEvaluation({submissionId:s.submissionId,fileDigest:s.fileDigest,category:r.category,result:{...resultBase(s),status:'completed',score:{value:r.result.score.value,scale:'normalized'}}});
  }
  function evaluate(input){
   if(disposed)return Promise.reject(new CodeError('evaluation.disposed'));let raw,key;try{raw=copyEvaluation(input);key=canonicalJson(raw);}catch(e){return Promise.reject(e);}
@@ -33,7 +33,7 @@ export function createEvaluationClient({remote,getCurrent,cryptoProvider,validat
    let timer;const interruption=new Promise(resolve=>{controller.signal.addEventListener('abort',()=>resolve(failureReport(s,job.timeout?'timed-out':'cancelled')),{once:true});timer=setTimeout(()=>{job.timeout=true;controller.abort();},timeoutMs);});
    const work=Promise.resolve().then(()=>controller.signal.aborted?failureReport(s,'cancelled'):remote(s,{signal:controller.signal})).then(r=>sanitize(s,r),()=>failureReport(s)).catch(()=>failureReport(s));
    const report=await Promise.race([work,interruption]);clearTimeout(timer);
-   const ignored=disposed||active!==job||!currentSubmission(s,getCurrent);if(active===job)active=null;
+   const ignored=disposed||ticket!==ownTicket||active!==job||!currentSubmission(s,getCurrent);if(active===job)active=null;
    const outcome=copyEvaluation({ignored,report});if(!ignored&&report.category!=='pending'){records.set(id,{key,outcome});while(records.size>maxRecords)records.delete(records.keys().next().value);}
    return outcome;
   })().finally(()=>admissions.delete(id));admission.promise=promise;admissions.set(id,admission);return promise;
