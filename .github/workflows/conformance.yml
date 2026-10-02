@@ -3,6 +3,7 @@ on: [push, pull_request]
 jobs:
   conformance:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -11,3 +12,9 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm test
+      - name: Resolve an approved local Node image for isolated execution tests
+        run: |
+          docker pull node:22-alpine
+          code_test_image_id=$(docker image inspect node:22-alpine --format '{{.Id}}')
+          printf 'CODE_TEST_IMAGE=%s\n' "$code_test_image_id" >> "$GITHUB_ENV"
+      - run: npm run test:docker

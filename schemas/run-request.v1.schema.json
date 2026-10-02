@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/interactive-project/code/blob/main/schemas/run-request.v1.schema.json",
+  "title": "Host-owned isolated execution request v1",
+  "type": "object",
+  "properties": {
+    "executionVersion": {
+      "const": "1.0.0"
+    },
+    "executionId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "activityId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "sessionId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "attemptId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "generation": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9+-]{0,31}$"
+    },
+    "runtime": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9.-]*/[a-z0-9][a-z0-9._-]*$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "entrypoint": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,63}$"
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "encoding": {
+            "const": "utf-8"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 100000
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "encoding",
+          "text"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "wallTimeMs": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30000
+        },
+        "memoryBytes": {
+          "type": "integer",
+          "minimum": 16777216,
+          "maximum": 268435456
+        },
+        "outputBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 262144
+        },
+        "workspaceBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048576
+        },
+        "processes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "scratchBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048576
+        }
+      },
+      "required": [
+        "wallTimeMs",
+        "memoryBytes",
+        "outputBytes",
+        "workspaceBytes",
+        "processes",
+        "scratchBytes"
+      ],
+      "additionalProperties": false
+    },
+    "filesystem": {
+      "const": "read-only-workspace"
+    },
+    "network": {
+      "const": "none"
+    }
+  },
+  "required": [
+    "executionVersion",
+    "executionId",
+    "activityId",
+    "sessionId",
+    "generation",
+    "revision",
+    "language",
+    "runtime",
+    "entrypoint",
+    "files",
+    "limits",
+    "filesystem",
+    "network"
+  ],
+  "additionalProperties": false
+}
