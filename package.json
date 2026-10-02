@@ -13,7 +13,9 @@
     "editor",
     "docs",
     "fixtures",
-    "README.md"
+    "README.md",
+    "execution",
+    "providers"
   ],
   "exports": {
     ".": {
@@ -31,10 +33,22 @@
       "import": "./editor/index.js",
       "default": "./editor/index.js"
     },
-    "./schemas/code-activity.v1.schema.json": "./schemas/code-activity.v1.schema.json"
+    "./schemas/code-activity.v1.schema.json": "./schemas/code-activity.v1.schema.json",
+    "./execution": {
+      "types": "./execution/index.d.ts",
+      "import": "./execution/index.js",
+      "default": "./execution/index.js"
+    },
+    "./providers/docker": {
+      "types": "./providers/docker/index.d.ts",
+      "import": "./providers/docker/index.js",
+      "default": "./providers/docker/index.js"
+    },
+    "./schemas/run-request.v1.schema.json": "./schemas/run-request.v1.schema.json"
   },
   "scripts": {
-    "test": "node scripts/check-conformance.mjs && node scripts/check-editor.mjs"
+    "test": "node scripts/check-conformance.mjs && node scripts/check-editor.mjs && node scripts/check-execution.mjs",
+    "test:docker": "node scripts/check-docker.mjs"
   },
   "peerDependencies": {
     "@interactive-project/protocol": "0.1.0",
