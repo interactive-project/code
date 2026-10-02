@@ -22,16 +22,16 @@ assert.throws(()=>createExecutionCoordinator({getCurrent:()=>request,provider:{m
  const missing=createExecutionCoordinator({getCurrent:()=>request,policy:{execution:true}});assert.equal((await missing.run(request)).terminal.reason,'driver-missing');missing.dispose();
 }
 {
- let resolve;const current={...request},published=[],coordinator=createExecutionCoordinator({getCurrent:()=>current,policy:{execution:true},provider:{manifest,run:r=>new Promise(done=>resolve=()=>done(completed(r)))},onTerminal:o=>published.push(o)});
+ let resolve;const current={...request},published=[],coordinator=createExecutionCoordinator({getCurrent:()=>current,policy:{execution:true,network:true},provider:{manifest,run:r=>new Promise(done=>resolve=()=>done(completed(r)))},onTerminal:o=>published.push(o)});
  const p=coordinator.run(request);await new Promise(r=>setImmediate(r));current.revision++;resolve();assert((await p).ignored);assert.equal(published.length,0);coordinator.dispose();
 }
 {
- let lateMessage;const coordinator=createExecutionCoordinator({getCurrent:()=>request,policy:{execution:true},provider:{manifest,run:(r,o)=>{lateMessage=o.onMessage;return new Promise(resolve=>o.signal.addEventListener('abort',()=>resolve({executionVersion:'1.0.0',executionId:r.executionId,status:'cancelled',reason:'cancelled',cleanupComplete:true}),{once:true}))}}});
+ let lateMessage;const coordinator=createExecutionCoordinator({getCurrent:()=>request,policy:{execution:true,network:true},provider:{manifest,run:(r,o)=>{lateMessage=o.onMessage;return new Promise(resolve=>o.signal.addEventListener('abort',()=>resolve({executionVersion:'1.0.0',executionId:r.executionId,status:'cancelled',reason:'cancelled',cleanupComplete:true}),{once:true}))}}});
  const p=coordinator.run(request);await new Promise(r=>setImmediate(r));coordinator.cancel();const result=await p;assert.equal(result.terminal.status,'cancelled');lateMessage({executionVersion:'1.0.0',executionId:request.executionId,sequence:0,channel:'stdout',text:'late'});assert.equal(result.messages.length,0);coordinator.dispose();
- const hung=createExecutionCoordinator({getCurrent:()=>request,policy:{execution:true},cleanupTimeoutMs:10,provider:{manifest,run:()=>new Promise(()=>{})}});const q=hung.run(request);await new Promise(r=>setImmediate(r));hung.cancel();assert.equal((await q).terminal.cleanupComplete,false);hung.dispose();
+ const hung=createExecutionCoordinator({getCurrent:()=>request,policy:{execution:true,network:true},cleanupTimeoutMs:10,provider:{manifest,run:()=>new Promise(()=>{})}});const q=hung.run(request);await new Promise(r=>setImmediate(r));hung.cancel();assert.equal((await q).terminal.cleanupComplete,false);hung.dispose();
 }
 {
- const coordinator=createExecutionCoordinator({getCurrent:()=>request,policy:{execution:true},provider:{manifest,run:(r,o)=>{o.onMessage({executionVersion:'1.0.0',executionId:r.executionId,sequence:0,channel:'stdout',text:'x'.repeat(5000)});return completed(r)}}});
+ const coordinator=createExecutionCoordinator({getCurrent:()=>request,policy:{execution:true,network:true},provider:{manifest,run:(r,o)=>{o.onMessage({executionVersion:'1.0.0',executionId:r.executionId,sequence:0,channel:'stdout',text:'x'.repeat(5000)});return completed(r)}}});
  assert.equal((await coordinator.run(request)).terminal.reason,'output-limit');coordinator.dispose();
 }
 console.log('Execution contract: request/schema/permission gates, retained idempotency, host-enforced provider profiles, bounded messages, cancellation cleanup and stale terminal rejection passed.');
