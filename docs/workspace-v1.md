@@ -1,0 +1,17 @@
+# Code workspace v1
+
+Code config contains schemaVersion 1.0.0, a ContentNode prompt, a lowercase language identifier, normalized relative entrypoint, 1–100 files and explicit create/rename/delete permissions. Language identifiers describe educational source; they do not imply an installed interpreter. Each file has a stable local ID, relative path, utf-8 string text and editable flag, with an optional language override.
+
+normalizePath accepts already normalized portable ASCII paths only. It rejects absolute paths, backslashes, drive/URI prefixes, empty/dot/dot-dot segments, percent encodings, spaces, trailing dots and Windows reserved basenames. Segments are at most 64 characters; paths at most 240. Paths are unique case-insensitively for portable hosts. This validates logical data, never resolves or accesses host files; providers must separately enforce filesystem isolation.
+
+File IDs remain stable through rename. The initial entrypoint resolves by exact configured path to an ID; state stores entrypointId, and resolveEntrypoint returns its current path after rename. Deleting the entrypoint is rejected. Duplicate IDs/paths, unsupported encodings, invalid Unicode and missing entrypoints are rejected at author boundaries.
+
+createWorkspacePorts returns pure Core StatePorts. initialState binds exactly to the captured code config and creates stateVersion 1.0.0 with learner files, version counters and deleted ID tombstones. Actions use interactive-project/code.create, edit, rename and delete. Read-only files cannot be edited, renamed or deleted. Global permissions additionally gate structural operations. Created files are editable, cannot elevate existing locks, and cannot reuse a deleted ID in the session.
+
+Edit payloads are {fileId,expectedVersion,from,to,insert}. Offsets are UTF-16 code units, from/to are inclusive/exclusive boundaries, and a surrogate pair cannot be split. The expected version must equal the current file version. Insertions and initial create text are limited to 4,000 code units to fit the Core action budget; build larger files with multiple bounded patches. Every accepted edit/rename increments file version. An outdated edit is rejected without changing state/events. No line-ending conversion is implicit.
+
+Each text is at most 100,000 code units; aggregate UTF-8 source is at most 1 MiB. Config/state JSON is capped at 2 MiB/depth 32. Up to 1,000 deleted IDs are retained; reaching the bound rejects further deletion rather than silently weakening identity. Empty workspaces and binary/base64/symlink objects are unsupported. Evaluation remains unevaluable/unassessed until execution/assessment providers are added.
+
+Prompts/source/version/path/permissions are portable data. Mount handles, editor models, selections, diagnostics, DOM nodes, credentials and execution services do not belong in workspace state or learner files. A learner may type arbitrary text; host authoring/assessment policy decides which scaffolds or trusted tests are learner-visible. Actual isolated execution and secret-test boundaries follow in code#2/#3.
+
+CI validates paths, duplicates, encoding and entrypoint; uses the actual Core runtime for read-only and stale-version edits, stable rename/entrypoint resolution, create/delete/tombstones, UTF-16 boundaries and immutable candidates. Neutral editor replacement tests prove the spec and learner state remain identical while live editor handles change.
